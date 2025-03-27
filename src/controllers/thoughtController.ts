@@ -7,9 +7,7 @@ export const getAllThoughts = async (_req: Request, res: Response) => {
         const thoughts = await Thought.find();
         res.json(thoughts);
     } catch (err: any) {
-        res.status(500).json({
-            message: err.message
-        });
+        res.status(500).json({ message: err.message });
     };
 };
 
@@ -20,9 +18,7 @@ export const getThoughtById = async (req: Request, res: Response) => {
         const thought = await Thought.findById(thoughtId);
         res.json(thought);
     } catch(err: any) {
-        res.status(500).json({
-            message: err.message
-        });
+        res.status(500).json({ message: err.message });
     };
 };
 
@@ -32,7 +28,7 @@ export const createThought = async (req: Request, res: Response) => {
         // Check if user exists - prevents creating a thought without a user present.
         const user = await User.findOne({ username: req.body.username });
         if(!user){
-            res.status(404).json({ message: 'User not found. Thought was not created.'})
+            return res.status(404).json({ message: 'User not found. Thought was not created.'})
         }
 
         // Create thought.
@@ -45,9 +41,9 @@ export const createThought = async (req: Request, res: Response) => {
             { runValidators: true, new: true }
         );
 
-        res.json(thought);
+        return res.json(thought);
     } catch(err: any) {
-        res.status(500).json(err);
+        return res.status(500).json(err);
     };
 };
 
@@ -61,14 +57,12 @@ export const updateThought = async (req: Request, res: Response) => {
         )
 
         if(!thought){
-            res.status(404).json({ message: 'Thought not found.' })
+            return res.status(404).json({ message: 'Thought not found.' })
         }
 
-        res.json(thought);
+        return res.json(thought);
     } catch(err: any) {
-        res.status(500).json({
-            message: err.message
-        });
+        return res.status(500).json({ message: err.message });
     };
 };
 
@@ -78,10 +72,14 @@ export const deleteThought = async (req: Request, res: Response) => {
         const thought = await Thought.findOneAndDelete({_id: req.params.thoughtId});
 
         if(!thought){
-            res.status(404).json({ message: 'Thought not found.' });
+            return res.status(404).json({ message: 'Thought not found.' });
+        } else {
+            await User.findOneAndUpdate(
+                { username: thought.username },
+                { $pull: { thoughts: req.params.thoughtId }}
+            );
+            return res.json({ message: 'Thought deleted' }); 
         }
-
-        return res.json({ message: 'Thought deleted' });
     } catch(err) {
         return res.status(500).json(err);
     }
@@ -97,12 +95,12 @@ export const addReaction = async (req: Request, res: Response) => {
         )
 
         if(!thought){
-            res.status(404).json({ message: 'Thought does not exist.' });
+            return res.status(404).json({ message: 'Thought does not exist.' });
         }
 
-        res.json(thought)
+        return res.json(thought)
     } catch(err) {
-        res.status(500).json(err);
+        return res.status(500).json(err);
     }
 };
 
@@ -116,11 +114,11 @@ export const removeReaction = async (req: Request, res: Response) => {
         );
 
         if(!thought){
-            res.status(404).json({ message: 'Thought not found.' });
+            return res.status(404).json({ message: 'Thought not found.' });
         }
 
-        res.json(thought);
+        return res.json(thought);
     } catch(err) {
-        res.status(500).json(err);
+        return res.status(500).json(err);
     }
 };
