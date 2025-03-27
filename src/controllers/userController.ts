@@ -7,9 +7,7 @@ export const getAllUsers = async (_req: Request, res: Response) => {
         const users = await User.find();
         res.json(users);
     } catch(err: any) {
-        res.status(500).json({
-            message: err.message
-        });
+        res.status(500).json({ message: err.message });
     }
 };
 
@@ -19,13 +17,11 @@ export const getUserById = async (req: Request, res: Response) => {
     try{
         const user = await User.findById(userId);
         if(!user){
-            res.status(404).json({ message: 'No user with this id.' });
+            return res.status(404).json({ message: 'No user with this id.' });
         }
-        res.json(user);
+        return res.json(user);
     } catch(err: any) {
-        res.status(500).json({
-            message: err.message
-        });
+        return res.status(500).json({ message: err.message });
     }
 };
 
@@ -49,14 +45,12 @@ export const updateUser = async (req: Request, res: Response) => {
         );
 
         if(!user){
-            res.status(404).json({ message: 'No user with this id.'})
+            return res.status(404).json({ message: 'No user with this id.'})
         }
 
-        res.json(user);
+        return res.json(user);
     } catch(err: any) {
-        res.status(400).json({
-            message: err.message
-        });
+        return res.status(400).json({ message: err.message });
     };
 };
 
@@ -66,13 +60,13 @@ export const deleteUser = async (req: Request, res: Response) => {
         const user = await User.findOneAndDelete({_id: req.params.userId});
         
         if(!user){
-            res.status(404).json({message: 'Could not find user.'});
+            return res.status(404).json({message: 'Could not find user.'});
         } else {
             await Thought.deleteMany({username: user.username})
-            res.json({message: 'User and thoughts deleted.'})
+            return res.json({message: 'User and thoughts deleted.'})
         }
     } catch(err) {
-        res.status(500).json(err);
+        return res.status(500).json(err);
     }
 };
 
@@ -85,12 +79,12 @@ export const addFriend = async (req: Request, res: Response) => {
         );
 
         if(!user){
-            res.status(404).json({ message: 'Could not find user.' });
+            return res.status(404).json({ message: 'Could not find user.' });
         }
 
-        res.json({ messge: 'Friend added.' })
+        return res.json({ messge: 'Friend added.' })
     } catch(err) {
-        res.status(500).json(err);
+        return res.status(500).json(err);
     }
 };
 
@@ -103,12 +97,12 @@ export const removeFriend = async (req: Request, res: Response) => {
         );
 
         if(!user){
-            res.status(404).json({ message: 'Could not fine user.' });
+            return res.status(404).json({ message: 'Could not fine user.' });
         }
 
-        res.json({ message: 'Friend removed' });
+        return res.json({ message: 'Friend removed' });
     } catch(err) {
-        res.status(500).json(err);
+       return res.status(500).json(err);
     }
 };
 
