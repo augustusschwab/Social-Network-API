@@ -10,7 +10,6 @@ interface IReaction extends Document{
 
 // Thought TypeScript Interface
 interface IThought extends Document {
-    _id: ObjectId, // DO I NEED THIS??
     thoughtText: string,
     createdAt: Date,
     username: string,
@@ -68,7 +67,6 @@ const thoughtSchema = new Schema<IThought>(
             virtuals: true,
             getters: true
         },
-        id: false,
     }
 );
 
