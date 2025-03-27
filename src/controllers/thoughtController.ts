@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Thought } from '../models/index.js';
+import { Thought, User } from '../models/index.js';
 
 // Get all Thoughts - returns an array of thoughts.
 export const getAllThoughts = async (_req: Request, res: Response) => {
@@ -29,7 +29,19 @@ export const getThoughtById = async (req: Request, res: Response) => {
 // Create a thought.
 export const createThought = async (req: Request, res: Response) => {
     try{
-        const thought = await Thought.create(req.params);
+        const thought = await Thought.create(req.body);
+
+        // Find the user and update the thought array.
+        const updatedUser = await User.findOneAndUpdate(
+            { username: req.body.username },
+            { $push: { thoughts: thought._id } },
+            { runValidators: true, new: true }
+        );
+
+        if(!updatedUser){
+            res.status(404).json({ message: 'User not found.' });
+        }
+
         res.json(thought);
     } catch(err: any) {
         res.status(500).json(err);
