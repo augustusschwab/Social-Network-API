@@ -76,3 +76,40 @@ export const deleteUser = async (req: Request, res: Response) => {
     }
 };
 
+// Add a friend to a user.
+export const addFriend = async (req: Request, res: Response) => {
+    try{
+        const user = await User.findOneAndUpdate(
+            { _id: req.params.userId },
+            { $push: {friends: req.params.friendId}},
+        );
+
+        if(!user){
+            res.status(404).json({ message: 'Could not find user.' });
+        }
+
+        res.json({ messge: 'Friend added.' })
+    } catch(err) {
+        res.status(500).json(err);
+    }
+};
+
+// Remove a friend from a user.
+export const removeFriend = async (req: Request, res: Response) => {
+    try{
+        const user = await User.findOneAndUpdate(
+            { _id: req.params.userId },
+            { $pull: {friends: req.params.friendId}},
+        );
+
+        if(!user){
+            res.status(404).json({ message: 'Could not fine user.' });
+        }
+
+        res.json({ message: 'Friend removed' });
+    } catch(err) {
+        res.status(500).json(err);
+    }
+};
+
+

@@ -29,18 +29,21 @@ export const getThoughtById = async (req: Request, res: Response) => {
 // Create a thought.
 export const createThought = async (req: Request, res: Response) => {
     try{
+        // Check if user exists - prevents creating a thought without a user present.
+        const user = await User.findOne({ username: req.body.username });
+        if(!user){
+            res.status(404).json({ message: 'User not found. Thought was not created.'})
+        }
+
+        // Create thought.
         const thought = await Thought.create(req.body);
 
-        // Find the user and update the thought array.
-        const updatedUser = await User.findOneAndUpdate(
+        // Update the user thought array.
+        await User.findOneAndUpdate(
             { username: req.body.username },
             { $push: { thoughts: thought._id } },
             { runValidators: true, new: true }
         );
-
-        if(!updatedUser){
-            res.status(404).json({ message: 'User not found.' });
-        }
 
         res.json(thought);
     } catch(err: any) {
