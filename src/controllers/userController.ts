@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { User } from '../models/index.js';
+import { User, Thought } from '../models/index.js';
 
 // Get All Users - returns and array of users.
 export const getAllUsers = async (_req: Request, res: Response) => {
@@ -18,6 +18,9 @@ export const getUserById = async (req: Request, res: Response) => {
     const { userId } = req.params;
     try{
         const user = await User.findById(userId);
+        if(!user){
+            res.status(404).json({ message: 'No user with this id.' });
+        }
         res.json(user);
     } catch(err: any) {
         res.status(500).json({
@@ -63,12 +66,13 @@ export const deleteUser = async (req: Request, res: Response) => {
         const user = await User.findOneAndDelete({_id: req.params.userId});
         
         if(!user){
-            return res.status(404).json({message: 'Could not find user.'});
+            res.status(404).json({message: 'Could not find user.'});
+        } else {
+            await Thought.deleteMany({username: user.username})
+            res.json({message: 'User and thoughts deleted.'})
         }
-
-        return res.json({message: 'User deleted.'})
     } catch(err) {
-        return res.status(500).json(err);
+        res.status(500).json(err);
     }
 };
 
